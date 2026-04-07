@@ -11,17 +11,41 @@ type ForgotPasswordData = {
 export default function ResetPasswordPage() {
   const router = useRouter();
   const [forgotData, setForgotData] = useState<ForgotPasswordData | null>(null);
+  const [message, setMessage] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  const getCookieValue = (name: string) => {
+    const match = document.cookie.split("; ").find((cookie) => cookie.startsWith(`${name}=`));
+    return match?.split("=")[1] ?? null;
+  };
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("forgotPassword");
-    if (stored) {
-      setForgotData(JSON.parse(stored));
+    const cookieValue = getCookieValue("forgotPassword");
+    if (!cookieValue) {
+      router.replace("/forgot-password");
+      setChecking(false);
+      return;
     }
-  }, []);
+
+    try {
+      const parsed = JSON.parse(decodeURIComponent(cookieValue)) as ForgotPasswordData;
+      if (!parsed.email || !parsed.otp) {
+        document.cookie = "forgotPassword=; Path=/; Max-Age=0";
+        router.replace("/forgot-password");
+        return;
+      }
+      setForgotData(parsed);
+    } catch {
+      document.cookie = "forgotPassword=; Path=/; Max-Age=0";
+      router.replace("/forgot-password");
+      return;
+    } finally {
+      setChecking(false);
+    }
+  }, [router]);
 
   const handleResetPassword = async () => {
     if (!forgotData) {
@@ -55,7 +79,7 @@ export default function ResetPasswordPage() {
 
       const data = await response.json();
       if (response.ok) {
-        sessionStorage.removeItem("forgotPassword");
+        document.cookie = "forgotPassword=; Path=/; Max-Age=0";
         setMessage("Password berhasil diperbarui. Mengarahkan ke login...");
         setTimeout(() => router.push("/login"), 1200);
       } else {
@@ -67,6 +91,14 @@ export default function ResetPasswordPage() {
       setLoading(false);
     }
   };
+
+  if (checking) {
+    return (
+      <div style={{ maxWidth: "400px", margin: "60px auto", fontFamily: "sans-serif", textAlign: "center" }}>
+        <p>Memeriksa akses...</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: "400px", margin: "60px auto", fontFamily: "sans-serif" }}>

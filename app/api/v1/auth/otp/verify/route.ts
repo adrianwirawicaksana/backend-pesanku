@@ -12,5 +12,12 @@ export async function POST(request: Request) {
     if (!otpRecord) return NextResponse.json({ message: "OTP salah" }, { status: 400 });
     if (otpRecord.expiresAt < new Date()) return NextResponse.json({ message: "OTP kadaluarsa" }, { status: 400 });
 
-    return NextResponse.json({ message: "OTP valid" });
+    const response = NextResponse.json({ message: "OTP valid" });
+    response.cookies.set("forgotPassword", JSON.stringify({ email, otp: code }), {
+        path: "/",
+        maxAge: 300,
+        sameSite: "lax",
+    });
+
+    return response;
 }

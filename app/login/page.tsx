@@ -120,11 +120,32 @@ export default function LoginPage() {
                 </button>
             </form>
 
-        <div style={{ textAlign: "center", marginTop: "12px" }}>
-            <a href="/forgot-password" style={{ color: "#0070f3", textDecoration: "none" }}>
-                Lupa password?
-            </a>
+            <div style={{ textAlign: "center", marginTop: "12px" }}>
+                <a href="/forgot-password" style={{ color: "#0070f3", textDecoration: "none" }}>
+                    Lupa password?
+                </a>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", margin: "20px 0", gap: "10px" }}>
+                <hr style={{ flex: 1, borderColor: "#ddd" }} />
+                <span style={{ color: "#999", fontSize: "14px" }}>atau</span>
+                <hr style={{ flex: 1, borderColor: "#ddd" }} />
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center" }}>
+                <GoogleLogin
+                    onSuccess={handleGoogleLogin}
+                    onError={() => setMessage("Google login failed")}
+                    useOneTap
+                    width="368"
+                />
+            </div>
+
+            {message && (
+                <p style={{ textAlign: "center", marginTop: "12px", color: message.includes("successful") ? "green" : "red" }}>
+                    {message}
+                </p>
+            )}
         </div>
-    </div>
     );
 }

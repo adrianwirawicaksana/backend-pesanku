@@ -26,13 +26,13 @@ export default function VerifyForm({ initialEmail = "" }: VerifyFormProps) {
     try {
       const response = await fetch("/api/v1/auth/otp/verify", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code: otp }),
       });
 
       const data = await response.json();
       if (response.ok) {
-        sessionStorage.setItem("forgotPassword", JSON.stringify({ email, otp }));
         router.push("/reset-password");
       } else {
         setMessage(data.message || "OTP tidak valid.");

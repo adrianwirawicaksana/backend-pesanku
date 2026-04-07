@@ -43,12 +43,10 @@ export async function POST(req: NextRequest) {
                 data: {
                     googleId: sub,
                     picture,
-                    provider: 'google',
+                    provider: user.password ? 'both' : 'google',
                 },
             })
-        }
-
-        if (!user) {
+        } else if (!user) {
             user = await prisma.user.create({
                 data: {
                     email,

@@ -6,7 +6,7 @@ export async function setAuthCookie(token: string) {
     cookieStore.set("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "none",
         path: "/",
         maxAge: 60 * 60 * 24,
     })
